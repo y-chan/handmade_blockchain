@@ -98,7 +98,7 @@ class TxIn:
 @dataclass
 class TxOut:
     value: int
-    pkscript: bytes
+    script_pubkey: bytes
 
     @classmethod
     def from_dict(cls, tx_out_data: Dict) -> "TxOut":
@@ -106,7 +106,7 @@ class TxOut:
 
         data_list: List[Tuple[str, type]] = [
             ("value", int),
-            ("pkscript", str)
+            ("script_pubkey", str)
         ]
 
         for data in data_list:
@@ -119,7 +119,7 @@ class TxOut:
 
     def as_dict(self) -> Dict:
         result = asdict(self)
-        result["pkscript"] = result["pkscript"].hex()
+        result["script_pubkey"] = result["script_pubkey"].hex()
         return result
 
     def as_hex(self) -> str:
@@ -127,13 +127,13 @@ class TxOut:
 
     def as_bin(self) -> bytes:
         """
-        TxOutはValue、PKScriptの2つの要素で成り立つ。
+        TxOutはValue、ScriptPubKeyの2つの要素で成り立つ。
         Valueは送金価格を表し、最小単位で示される。
-        PKScriptは送金のためのスクリプトが記述される。(Bitcoin Scriptが用いられるが、複雑なため省略)
+        ScriptPubKeyは送金のためのスクリプトが記述される。(Bitcoin Scriptが用いられるが、複雑なため省略)
         """
         block_bin = self.value.to_bytes(8, "little")
-        block_bin += int_to_bytes(len(self.pkscript))
-        block_bin += self.pkscript
+        block_bin += int_to_bytes(len(self.script_pubkey))
+        block_bin += self.script_pubkey
         return block_bin
 
 

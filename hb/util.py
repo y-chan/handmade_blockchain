@@ -9,3 +9,13 @@ def int_to_bytes(num: int) -> bytes:
         return hed.to_bytes(1, "little") + num.to_bytes(4, "little")
     hed = 0xff
     return hed.to_bytes(1, "little") + num.to_bytes(8, "little")
+
+
+def bits_to_target(bits: int) -> int:
+    bitsN = (bits >> 24) & 0xff
+    if not (0x03 <= bitsN <= 0x1f):
+        raise Exception("First part of bits should be in [0x03, 0x1f]")
+    bitsBase = bits & 0xffffff
+    if not (0x8000 <= bitsBase <= 0x7fffff):
+        raise Exception("Second part of bits should be in [0x8000, 0x7fffff]")
+    return bitsBase << (8 * (bitsN-3))

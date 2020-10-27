@@ -3,6 +3,8 @@ from typing import List, Dict, Tuple
 
 from .util import int_to_bytes
 
+from hashlib import sha256
+
 import binascii
 
 
@@ -206,3 +208,7 @@ class Tx:
         block_bin += self.locktime.to_bytes(4, "little")
 
         return block_bin
+
+    def tx_hash(self) -> bytes:
+        block_bin = self.as_bin()
+        return sha256(sha256(block_bin).digest()).digest()

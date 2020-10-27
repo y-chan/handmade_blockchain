@@ -3,6 +3,7 @@ from typing import Dict, List, Tuple, Union
 
 from hashlib import sha256
 
+from .tx import Tx
 from .util import int_to_bytes
 
 import binascii
@@ -16,7 +17,7 @@ class Block:
     time: int
     bits: int
     nonce: int
-    transactions: List[bytes]
+    transactions: List[Tx]
 
     @classmethod
     def from_dict(cls, block: Dict, block_hash: Union[str, bytes] = None) -> "Block":
@@ -40,7 +41,7 @@ class Block:
             elif one_of_block_data is not None and data[1] == list:
                 shaped_block[data[0]] = []
                 for tx in one_of_block_data:
-                    shaped_block[data[0]].append(binascii.a2b_hex(tx))
+                    shaped_block[data[0]].append(Tx.from_dict(tx))
 
         block = cls(**shaped_block)
 
@@ -61,7 +62,7 @@ class Block:
         txs = result["transactions"]
         result["transactions"] = []
         for tx in txs:
-            result["transactions"].append(tx[::-1])
+            result["transactions"].append(tx.as_dict())
         return result
 
     def as_hex(self) -> str:

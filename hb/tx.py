@@ -49,7 +49,7 @@ class OutPoint:
 @dataclass
 class TxIn:
     outpoint: OutPoint
-    sig_script: bytes
+    script_sig: bytes
     sequence: int
 
     @classmethod
@@ -58,7 +58,7 @@ class TxIn:
 
         data_list: List[Tuple[str, type]] = [
             ("outpoint", dict),
-            ("sig_script", str),
+            ("script_sig", str),
             ("sequence", int)
         ]
 
@@ -75,7 +75,7 @@ class TxIn:
     def as_dict(self) -> Dict:
         result = asdict(self)
         result["outpoint"] = result["outpoint"].as_dict()
-        result["sig_script"] = result["sig_script"].hex()
+        result["script_sig"] = result["script_sig"].hex()
         return result
 
     def as_hex(self) -> str:
@@ -83,14 +83,14 @@ class TxIn:
 
     def as_bin(self) -> bytes:
         """
-        TxInはOutPoint、SigScript、Sequenceの3つの要素で成り立つ。
+        TxInはOutPoint、ScriptSig(Signatureの略)、Sequenceの3つの要素で成り立つ。
         OutPointの詳細はOutPoint Classを参照。
-        SigScriptはOutPointでたどられた通貨を所有していることを証明するための、秘密鍵による署名が入ることが一般的。
+        ScriptSigはOutPointでたどられた通貨を所有していることを証明するための、秘密鍵による署名が入ることが一般的。
         SequenceはCSV(Check Sequence Verify)に使われる。
         """
         block_bin = self.outpoint.as_bin()
-        block_bin += int_to_bytes(len(self.sig_script))
-        block_bin += self.sig_script
+        block_bin += int_to_bytes(len(self.script_sig))
+        block_bin += self.script_sig
         block_bin += self.sequence.to_bytes(4, "little")
         return block_bin
 

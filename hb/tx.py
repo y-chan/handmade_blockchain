@@ -174,15 +174,7 @@ class Tx:
         return cls(**shaped_data)
 
     def as_dict(self) -> Dict:
-        result = asdict(self)
-        tx_ins = result["tx_ins"]
-        tx_outs = result["tx_outs"]
-        result["tx_ins"] = []
-        for tx_in in tx_ins:
-            result["tx_ins"].append(tx_in.as_dict())
-        for tx_out in tx_outs:
-            result["tx_outs"].append(tx_out.as_dict())
-        return result
+        return asdict(self)
 
     def as_hex(self) -> str:
         return self.as_bin().hex()

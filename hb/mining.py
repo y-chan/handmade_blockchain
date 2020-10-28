@@ -27,12 +27,15 @@ def create_genesis_block(msg: str, time: int, bits: int, reward: int) -> Block:
         ascii_msg.append(ord(s))
     tx_in = TxIn(
         outpoint=outpoint,
-        script_sig=len(first_bits).to_bytes(1, "little") +  # 文字列(何かしらの数値も含む)を入れるときはまず長さを入れる
-                   first_bits +  # bitsを挿入
-                   b"\x01\x04" +  # Bitcoinではなぜか"4"という数字が文字列として挿入されているため、それに従い長さと文字列本体を挿入
-                   script_int_to_bytes(
-                       len(msg)) +  # ジェネシスメッセージの長さを挿入。Bitcoin Scriptに従い、0x4d以上の長さであれば大きさに応じてPUSHDATAが付与される
-                   bytes(ascii_msg),  # ジェネシスメッセージをASCIIで挿入
+        script_sig=(
+            len(first_bits).to_bytes(1, "little") +  # 文字列(何かしらの数値も含む)を入れるときはまず長さを入れる
+            first_bits +  # bitsを挿入
+            b"\x01\x04" +  # Bitcoinではなぜか"4"という数字が文字列として挿入されているため、それに従い長さと文字列本体を挿入
+            script_int_to_bytes(
+                len(msg)  # ジェネシスメッセージの長さを挿入。Bitcoin Scriptに従い、0x4d以上の長さであれば大きさに応じてPUSHDATAが付与される
+            ) +
+            bytes(ascii_msg)  # ジェネシスメッセージをASCIIで挿入
+        ),
         sequence=0xffffffff  # デフォルトが最大値。特に何もなければこのデフォルト値を使う。
     )
     tx_out = TxOut(

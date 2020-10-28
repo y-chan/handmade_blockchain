@@ -86,7 +86,7 @@ class Block:
         """
         生のブロックはバージョン(little、4bytes)、前ブロックのハッシュ(little)、マークルルート(little)、時間(little、4bytes)、
         bits(難易度のやつ、little、4bytes)、nonce(little、4bytes)、
-        transaction count(1byte、254を超える場合はBitcoin ScriptのPUSHDATAと同じ扱い)
+        transaction count(1byte、254を超える場合はBitcoin ScriptのPUSHDATAと似た扱い)
         transactions(transaction count分のtransactionがざっと並ぶ)という、以上の要素で成り立つ。
         """
         block_bin = self._as_bin()

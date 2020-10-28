@@ -18,8 +18,8 @@ def create_genesis_block(msg: str, time: int, bits: int, reward: int) -> Block:
 
     # とりあえずジェネシスメッセージを含んだジェネシストランザクションを生成
     outpoint = OutPoint(
-        tx_hash=bytes([0])*32,
-        index=4294967295  #この数値はuint32における最大値。通常の送金等では使われることはまずないだろうということで使われていると推測
+        tx_hash=bytes([0]) * 32,
+        index=4294967295  # この数値はuint32における最大値。通常の送金等では使われることはまずないだろうということで使われていると推測
     )
     first_bits = (0x1d00ffff).to_bytes(4, "little")  # リトルエンディアンで格納されるため
     ascii_msg = []
@@ -28,10 +28,11 @@ def create_genesis_block(msg: str, time: int, bits: int, reward: int) -> Block:
     tx_in = TxIn(
         outpoint=outpoint,
         script_sig=len(first_bits).to_bytes(1, "little") +  # 文字列(何かしらの数値も含む)を入れるときはまず長さを入れる
-        first_bits +  # bitsを挿入
-        b"\x01\x04" +  # Bitcoinではなぜか"4"という数字が文字列として挿入されているため、それに従い長さと文字列本体を挿入
-        script_int_to_bytes(len(msg)) +  # ジェネシスメッセージの長さを挿入。Bitcoin Scriptに従い、0x4d以上の長さであれば大きさに応じてPUSHDATAが付与される
-        bytes(ascii_msg),  # ジェネシスメッセージをASCIIで挿入
+                   first_bits +  # bitsを挿入
+                   b"\x01\x04" +  # Bitcoinではなぜか"4"という数字が文字列として挿入されているため、それに従い長さと文字列本体を挿入
+                   script_int_to_bytes(
+                       len(msg)) +  # ジェネシスメッセージの長さを挿入。Bitcoin Scriptに従い、0x4d以上の長さであれば大きさに応じてPUSHDATAが付与される
+                   bytes(ascii_msg),  # ジェネシスメッセージをASCIIで挿入
         sequence=0xffffffff  # デフォルトが最大値。特に何もなければこのデフォルト値を使う。
     )
     tx_out = TxOut(
@@ -50,7 +51,7 @@ def create_genesis_block(msg: str, time: int, bits: int, reward: int) -> Block:
     # 一旦ブロックを作る(nonceは0を設定)
     block = Block(
         version=1,  # versionの説明は上記ですでにされているため省略
-        hash_prev_block=bytes([0])*32,  # 本来はNULLが代入されているが、簡易的な処理しか実装していないので32bytes分の0を代入
+        hash_prev_block=bytes([0]) * 32,  # 本来はNULLが代入されているが、簡易的な処理しか実装していないので32bytes分の0を代入
         hash_merkle_root=genesis_tx.tx_hash(),  # 本来merkle root生成機構を通すべきだが、ジェネシスブロック上では無意味なので省略
         time=time,
         bits=bits,

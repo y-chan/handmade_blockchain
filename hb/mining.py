@@ -22,9 +22,6 @@ def create_genesis_block(msg: str, time: int, bits: int, reward: int) -> Block:
         index=4294967295  # この数値はuint32における最大値。通常の送金等では使われることはまずないだろうということで使われていると推測
     )
     first_bits = (0x1d00ffff).to_bytes(4, "little")  # リトルエンディアンで格納されるため
-    ascii_msg = []
-    for s in msg:
-        ascii_msg.append(ord(s))
     tx_in = TxIn(
         outpoint=outpoint,
         script_sig=(
@@ -34,7 +31,7 @@ def create_genesis_block(msg: str, time: int, bits: int, reward: int) -> Block:
             script_int_to_bytes(
                 len(msg)  # ジェネシスメッセージの長さを挿入。Bitcoin Scriptに従い、0x4d以上の長さであれば大きさに応じてPUSHDATAが付与される
             ) +
-            bytes(ascii_msg)  # ジェネシスメッセージをASCIIで挿入
+            msg.encode("ascii")
         ),
         sequence=0xffffffff  # デフォルトが最大値。特に何もなければこのデフォルト値を使う。
     )

@@ -62,16 +62,17 @@ def create_genesis_block(msg: str, time: int, bits: int, reward: int) -> Block:
         transactions=[genesis_tx]
     )
 
-    # bitsは32bytesのtargetに変換され、使用される。使用方法は後程
+    # bitsは32bytesのバイト列に変換され、さらにintのtargetに変換されて使用される。使用方法は後程
     target = bits_to_target(bits)
 
     for i in range(0xffffffff):
         # マイニングとは、生成するブロックのハッシュがあらかじめ設定されたtargetよりも小さくなるようなnonceを探すことである。
         # というわけで、全探索的にnonceを探す。
         block.nonce = i  # nonceを設定
-        block_hash = int.from_bytes(block.block_hash(), "big")  # ブロックのハッシュを整数に直す
-        print(block.nonce, target, block_hash)
+        block_hash = int.from_bytes(block.block_hash(), "big")  # ブロックのハッシュをintに直す
+        # targetとblock_hashを比較し、targetがblock_hash以下であれば、マイニング成功(=ジェネシスブロック生成成功)
         if target > block_hash:
+            print("nonce found!", f"nonce = {block.nonce}", f"block hash = 0x%064x" % block_hash)
             break
 
     return block

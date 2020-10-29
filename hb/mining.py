@@ -4,6 +4,7 @@ from .script import script_int_to_bytes
 from .util import bits_to_target
 
 import binascii
+import random
 
 
 def create_genesis_block(msg: str, time: int, bits: int, reward: int) -> Block:
@@ -59,17 +60,30 @@ def create_genesis_block(msg: str, time: int, bits: int, reward: int) -> Block:
         transactions=[genesis_tx]
     )
 
-    # bitsは32bytesのバイト列に変換され、さらにintのtargetに変換されて使用される。使用方法は後程
-    target = bits_to_target(bits)
+    return mining_block(block)
 
-    for i in range(0xffffffff):
+
+def mining_block(block: Block) -> Block:
+    # bitsは32bytesのバイト列に変換され、さらにintのtargetに変換されて使用される。使用方法は後程
+    target = bits_to_target(block.bits)
+
+    nonce_found = False
+    # 0から探すのではなく、ランダム性をもたせる
+    start = random.randint(0, 0xffffffff)
+
+    for i in range(start, 0xffffffff):
         # マイニングとは、生成するブロックのハッシュがあらかじめ設定されたtargetよりも小さくなるようなnonceを探すことである。
         # というわけで、全探索的にnonceを探す。
         block.nonce = i  # nonceを設定
         block_hash = int.from_bytes(block.block_hash(), "big")  # ブロックのハッシュをintに直す
-        # targetとblock_hashを比較し、targetがblock_hash以下であれば、マイニング成功(=ジェネシスブロック生成成功)
+        # targetとblock_hashを比較し、targetがblock_hash以下であれば、マイニング成功(=ブロック生成成功)
         if target > block_hash:
             print("nonce found!", f"nonce = {block.nonce}", f"block hash = 0x%064x" % block_hash)
+            nonce_found = True
             break
 
+    # 万が一探索しきっても見つからなければ、再探索する
+    if not nonce_found:
+        return mining_block(block)
     return block
+

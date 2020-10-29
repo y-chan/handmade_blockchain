@@ -1,9 +1,7 @@
 from dataclasses import dataclass, asdict
 from typing import List, Dict, Tuple
 
-from .util import int_to_bytes
-
-from hashlib import sha256
+from .util import int_to_bytes, sha256d
 
 import binascii
 
@@ -203,4 +201,4 @@ class Tx:
 
     def tx_hash(self) -> bytes:
         block_bin = self.as_bin()
-        return sha256(sha256(block_bin).digest()).digest()
+        return sha256d(block_bin)

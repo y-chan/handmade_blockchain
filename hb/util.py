@@ -1,5 +1,6 @@
 from typing import Dict, List
 
+import hashlib
 import json
 
 
@@ -40,3 +41,11 @@ def dump_block(block: Dict) -> None:
 
 def dump_tx(tx: Dict) -> None:
     load_and_dump_json("tx", tx)
+
+
+def sha256(x: bytes) -> bytes:
+    return bytes(hashlib.sha256(x).digest())
+
+
+def sha256d(x: bytes) -> bytes:
+    return bytes(sha256(sha256(x)))

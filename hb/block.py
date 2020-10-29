@@ -1,10 +1,8 @@
 from dataclasses import dataclass, asdict
 from typing import Dict, List, Tuple, Union
 
-from hashlib import sha256
-
 from .tx import Tx
-from .util import int_to_bytes
+from .util import int_to_bytes, sha256d
 
 import binascii
 
@@ -99,5 +97,5 @@ class Block:
 
     def block_hash(self) -> bytes:
         block_bin = self._as_bin()
-        return sha256(sha256(block_bin).digest()).digest()
+        return sha256d(block_bin)
 

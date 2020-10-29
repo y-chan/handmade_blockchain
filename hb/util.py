@@ -49,20 +49,22 @@ def made_merkle_root(txs: List[bytes]) -> bytes:
         return result[0]
 
 
-def load_and_dump_json(file_name: str, content: Dict) -> None:
-    with open(f"../blockchain_data/{file_name}") as f:
+def dump_block(block: Dict) -> None:
+    with open(f"../blockchain_data/blockchain.json") as f:
         file: List[Dict] = json.loads(f.read())
-    file.append(content)
-    with open(f"../blockchain_data/{file_name}", "w") as f:
+    file.append(block)
+    with open(f"../blockchain_data/blockchain.json", "w") as f:
         f.write(json.dumps(file))
 
 
-def dump_block(block: Dict) -> None:
-    load_and_dump_json("blockchain", block)
+def load_txs() -> List[Dict]:
+    with open(f"../blockchain_data/tx.json") as f:
+        return json.loads(f.read())
 
 
-def dump_tx(tx: Dict) -> None:
-    load_and_dump_json("tx", tx)
+def dump_txs(txs: List[Dict]) -> None:
+    with open(f"../blockchain_data/tx.json", "w") as f:
+        f.write(json.dumps(txs))
 
 
 def sha256(x: bytes) -> bytes:

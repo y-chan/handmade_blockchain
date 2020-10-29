@@ -27,6 +27,28 @@ def bits_to_target(bits: int) -> int:
     return bitsBase << (8 * (bitsN-3))
 
 
+def made_merkle_root(txs: List[bytes]) -> bytes:
+    result = []
+    one = txs[0]
+    for tx in txs[1:]:
+        if one is not None:
+            result.append(sha256d(one + tx))
+            one = None
+        else:
+            one = tx
+
+    if one is not None:
+        if result:
+            result.append(sha256d(one + one))
+        else:
+            result.append(one)
+
+    if len(result) >= 2:
+        return made_merkle_root(result)
+    else:
+        return result[0]
+
+
 def load_and_dump_json(file_name: str, content: Dict) -> None:
     with open(f"../blockchain_data/{file_name}") as f:
         file: List[Dict] = json.loads(f.read())

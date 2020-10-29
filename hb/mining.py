@@ -60,6 +60,7 @@ def create_genesis_block(msg: str, time: int, bits: int, reward: int) -> Block:
         transactions=[genesis_tx]
     )
 
+    # マイニングに移行
     return mining_block(block)
 
 

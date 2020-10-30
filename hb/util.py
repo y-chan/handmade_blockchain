@@ -49,12 +49,14 @@ def made_merkle_root(txs: List[bytes]) -> bytes:
         return result[0]
 
 
-def dump_block(block: Dict) -> None:
+def load_blocks() -> List[Dict]:
     with open(f"../blockchain_data/blockchain.json") as f:
-        file: List[Dict] = json.loads(f.read())
-    file.append(block)
+        return json.loads(f.read())
+
+
+def dump_blocks(blocks: List[Dict]) -> None:
     with open(f"../blockchain_data/blockchain.json", "w") as f:
-        f.write(json.dumps(file))
+        f.write(json.dumps(blocks))
 
 
 def load_txs() -> List[Dict]:

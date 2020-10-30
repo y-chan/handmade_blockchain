@@ -27,6 +27,17 @@ def bits_to_target(bits: int) -> int:
     return bitsBase << (8 * (bitsN-3))
 
 
+def target_to_bits(target: int) -> int:
+    c = ("%064x" % target)[2:]
+    while c[:2] == '00' and len(c) > 6:
+        c = c[2:]
+    bitsN, bitsBase = len(c) // 2, int.from_bytes(bytes.fromhex(c[:6]), byteorder='big')
+    if bitsBase >= 0x800000:
+        bitsN += 1
+        bitsBase >>= 8
+    return bitsN << 24 | bitsBase
+
+
 def made_merkle_root(txs: List[bytes]) -> bytes:
     result = []
     one = txs[0]

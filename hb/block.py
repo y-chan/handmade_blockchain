@@ -5,6 +5,7 @@ from .tx import Tx
 from .util import int_to_bytes, sha256d
 
 import binascii
+import json
 
 
 @dataclass
@@ -98,4 +99,21 @@ class Block:
     def block_hash(self) -> bytes:
         block_bin = self._as_bin()
         return sha256d(block_bin)
+
+
+def load_blocks() -> List[Block]:
+    result = []
+    with open(f"../blockchain_data/blockchain.json") as f:
+        blocks = json.loads(f.read())
+    for block in blocks:
+        result.append(Block.from_dict(block))
+    return result
+
+
+def dump_blocks(blocks: List[Block]) -> None:
+    dump_json = []
+    for block in blocks:
+        dump_json.append(block.as_dict())
+    with open(f"../blockchain_data/blockchain.json", "w") as f:
+        f.write(json.dumps(dump_json))
 

@@ -4,6 +4,7 @@ from typing import List, Dict, Tuple
 from .util import int_to_bytes, sha256d
 
 import binascii
+import json
 
 
 @dataclass
@@ -202,3 +203,20 @@ class Tx:
     def tx_hash(self) -> bytes:
         block_bin = self.as_bin()
         return sha256d(block_bin)
+
+
+def load_txs() -> List[Tx]:
+    result = []
+    with open(f"../blockchain_data/tx.json") as f:
+        txs = json.loads(f.read())
+    for tx in txs:
+        result.append(Tx.from_dict(tx))
+    return result
+
+
+def dump_txs(txs: List[Tx]) -> None:
+    dump_json = []
+    for tx in txs:
+        dump_json.append(tx.as_dict())
+    with open(f"../blockchain_data/tx.json", "w") as f:
+        f.write(json.dumps(dump_json))

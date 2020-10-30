@@ -2,7 +2,8 @@ from dataclasses import dataclass, asdict
 from typing import Dict, List, Tuple, Union
 
 from .tx import Tx
-from .util import int_to_bytes, sha256d
+from .util import int_to_bytes, sha256d, bits_to_target, target_to_bits
+from .config import retarget_block_count, retarget_time_span
 
 import binascii
 import json
@@ -117,3 +118,23 @@ def dump_blocks(blocks: List[Block]) -> None:
     with open(f"../blockchain_data/blockchain.json", "w") as f:
         f.write(json.dumps(dump_json))
 
+
+def get_target(blocks: List[Block]) -> int:
+    """
+    Bitcoinの場合、マイニング難易度の調整は2016ブロックに一回行われている。
+    難易度変更条件は、2016ブロック生成されるまでにどのくらい時間がかかっているかを見て、指定された時間より長ければ難易度を落とし、
+    指定された時間よりも短ければ難易度を上げる
+    """
+    if not len(blocks) % retarget_block_count:
+        first = blocks[-(retarget_block_count-1)]
+        last = blocks[-1]
+        target = bits_to_target(last.bits)
+        n_actual_timespan = last.time - first.time
+        n_actual_timespan = max(n_actual_timespan, retarget_time_span // 4)
+        n_actual_timespan = min(n_actual_timespan, retarget_time_span * 4)
+        new_target = min(0x00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffff, (target * n_actual_timespan) // retarget_time_span)
+    else:
+        return bits_to_target(blocks[-1].bits)
+
+    new_target = bits_to_target(target_to_bits(new_target))
+    return new_target

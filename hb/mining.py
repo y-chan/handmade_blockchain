@@ -18,36 +18,28 @@ def create_genesis_block(msg: str, time: int, bits: int, reward: int) -> Block:
     """
 
     # とりあえずジェネシスメッセージを含んだジェネシストランザクションを生成
-    outpoint = OutPoint(
-        tx_hash=bytes([0]) * 32,
-        index=0xffffffff  # この数値はuint32における最大値。通常の送金等では使われることはまずないだろうということで使われていると推測
-    )
+
     first_bits = bits.to_bytes(4, "little")  # リトルエンディアンで格納されるため
-    tx_in = TxIn(
-        outpoint=outpoint,
-        script_sig=(
+    # script_sigの生成
+    script_sig = (
             len(first_bits).to_bytes(1, "little") +  # 文字列(何かしらの数値も含む)を入れるときはまず長さを入れる
             first_bits +  # bitsを挿入
             b"\x01\x04" +  # Bitcoinではなぜか"4"という数字が文字列として挿入されているため、それに従い長さと文字列本体を挿入
             script_int_to_bytes(
                 len(msg)  # ジェネシスメッセージの長さを挿入。Bitcoin Scriptに従い、0x4d以上の長さであれば大きさに応じてPUSHDATAが付与される
             ) +
-        ),
             msg.encode("ascii")  # メッセージそのものを挿入
-        sequence=0xffffffff  # デフォルトが最大値。特に何もなければこのデフォルト値を使う。
     )
-    tx_out = TxOut(
-        value=reward,  # マイニング報酬も設定値をそのまま代入
-        script_pubkey=binascii.a2b_hex(
-            "4104678afdb0fe5548271967f1a67130b7105cd6a828e03909a67962e0ea1f61deb649f6bc3f4cef38c4f35504e51ec112de5c384df7ba0b8d578a4c702b6bf11d5fac"
-        )  # 本来、script pubkeyに代入する値も自分で生成すべきなのだが、手間がかかるのでBitcoinのものを丸ごと流用している。
+
+    # script pubkeyの生成
+    # 本来、script pubkeyに代入する値も自分で生成すべきなのだが、手間がかかるのでBitcoinのものを丸ごと流用している。
+    # また、開業しているが長いからコーディングガイドラインにしたがって改行しただけで特に意味はない
+    script_pubkey = binascii.a2b_hex(
+        "4104678afdb0fe5548271967f1a67130b7105cd6a828e03909a67962e0ea1f61deb"
+        "649f6bc3f4cef38c4f35504e51ec112de5c384df7ba0b8d578a4c702b6bf11d5fac"
     )
-    genesis_tx = Tx(
-        version=1,  # 現在BitcoinにTxのVersionは1と2があるが、特別な機能(=SegWit等)を使わない限り1でよい
-        tx_ins=[tx_in],  # tx_inをリストにして代入
-        tx_outs=[tx_out],  # tx_inと一緒
-        locktime=0  # locktimeは特に必要がないので0を代入
-    )
+
+    genesis_tx = create_coinbase_tx(script_sig, script_pubkey, reward)
 
     # 一旦ブロックを作る(nonceは0を設定)
     block = Block(
@@ -62,6 +54,30 @@ def create_genesis_block(msg: str, time: int, bits: int, reward: int) -> Block:
 
     # マイニングに移行
     return mining_block(block)
+
+
+def create_coinbase_tx(script_sig: bytes, script_pubkey: bytes, reward: int) -> Tx:
+    outpoint = OutPoint(
+        tx_hash=bytes([0]) * 32,
+        index=0xffffffff  # この数値はuint32における最大値。通常の送金等では使われることはまずないだろうということで使われていると推測
+    )
+    tx_in = TxIn(
+        outpoint=outpoint,
+        script_sig=script_sig,
+        sequence=0xffffffff  # デフォルトが最大値。特に何もなければこのデフォルト値を使う。
+    )
+    tx_out = TxOut(
+        value=reward,  # マイニング報酬は設定値をそのまま代入
+        script_pubkey=script_pubkey
+    )
+    coinbase_tx = Tx(
+        version=1,  # 現在BitcoinにTxのVersionは1と2があるが、特別な機能(=SegWit等)を使わない限り1でよい
+        tx_ins=[tx_in],  # tx_inをリストにして代入
+        tx_outs=[tx_out],  # tx_inと一緒
+        locktime=0  # locktimeは特に必要がないので0を代入
+    )
+
+    return coinbase_tx
 
 
 def mining_block(block: Block) -> Block:

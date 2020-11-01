@@ -156,3 +156,17 @@ def script_int_to_bytes(num: int) -> bytes:
     else:
         hed = Opcodes.OP_PUSHDATA4
         return hed.to_bytes(1, "little") + num.to_bytes(4, "little")
+
+
+def script_int_to_bytes_contain_opcode(num: int) -> bytes:
+    """
+    -1以上16以下の整数を文字列としてではなく整数として埋め込む場合、OPCodeのことを考慮して、OP_0～OP_16を用いる
+    それ以上の整数は文字列として埋め込む場合と同じように扱われる
+    """
+    if num == -1 or 1 <= num <= 16:
+        return bytes([num + (Opcodes.OP_1 - 1)])
+    elif num == 0:
+        return bytes([Opcodes.OP_0])
+    else:
+        return script_int_to_bytes(num)
+

@@ -22,7 +22,7 @@ def create_genesis_block(msg: str, time: int, bits: int, reward: int) -> Block:
         tx_hash=bytes([0]) * 32,
         index=4294967295  # この数値はuint32における最大値。通常の送金等では使われることはまずないだろうということで使われていると推測
     )
-    first_bits = (0x1d00ffff).to_bytes(4, "little")  # リトルエンディアンで格納されるため
+    first_bits = bits.to_bytes(4, "little")  # リトルエンディアンで格納されるため
     tx_in = TxIn(
         outpoint=outpoint,
         script_sig=(

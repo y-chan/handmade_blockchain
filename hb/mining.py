@@ -32,8 +32,8 @@ def create_genesis_block(msg: str, time: int, bits: int, reward: int) -> Block:
             script_int_to_bytes(
                 len(msg)  # ジェネシスメッセージの長さを挿入。Bitcoin Scriptに従い、0x4d以上の長さであれば大きさに応じてPUSHDATAが付与される
             ) +
-            msg.encode("ascii")
         ),
+            msg.encode("ascii")  # メッセージそのものを挿入
         sequence=0xffffffff  # デフォルトが最大値。特に何もなければこのデフォルト値を使う。
     )
     tx_out = TxOut(

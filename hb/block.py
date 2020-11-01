@@ -132,7 +132,7 @@ def get_target(blocks: List[Block]) -> int:
         n_actual_timespan = last.time - first.time
         n_actual_timespan = max(n_actual_timespan, retarget_time_span // 4)
         n_actual_timespan = min(n_actual_timespan, retarget_time_span * 4)
-        new_target = min(0x00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffff, (target * n_actual_timespan) // retarget_time_span)
+        new_target = min(0x0000ffff00000000000000000000000000000000000000000000000000000000, (target * n_actual_timespan) // retarget_time_span)
     else:
         return bits_to_target(blocks[-1].bits)
 

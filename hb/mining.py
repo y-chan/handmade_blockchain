@@ -20,7 +20,7 @@ def create_genesis_block(msg: str, time: int, bits: int, reward: int) -> Block:
     # とりあえずジェネシスメッセージを含んだジェネシストランザクションを生成
     outpoint = OutPoint(
         tx_hash=bytes([0]) * 32,
-        index=4294967295  # この数値はuint32における最大値。通常の送金等では使われることはまずないだろうということで使われていると推測
+        index=0xffffffff  # この数値はuint32における最大値。通常の送金等では使われることはまずないだろうということで使われていると推測
     )
     first_bits = bits.to_bytes(4, "little")  # リトルエンディアンで格納されるため
     tx_in = TxIn(

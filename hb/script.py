@@ -142,6 +142,9 @@ class Opcodes(IntEnum):
 
 
 def script_int_to_bytes(num: int) -> bytes:
+    """
+    整数を文字列として埋め込む場合に用いる
+    """
     if num < Opcodes.OP_PUSHDATA1:
         return num.to_bytes(1, "little")
     elif num <= 0xff:

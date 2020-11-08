@@ -1,6 +1,7 @@
 from typing import Tuple, Optional
 
 from .util import sha256d
+from .script import Opcodes
 
 
 __b58chars = b"123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
@@ -72,3 +73,18 @@ def hash160_to_b58_address(h160: bytes) -> str:
     s = s + sha256d(s)[0:4]
     return base_encode(s)
 
+
+def address_to_script(addr: str) -> bytes:
+    script = bytes([Opcodes.OP_DUP, Opcodes.OP_HASH160])
+    script += b58_address_to_hash160(addr)[1]
+    script += bytes([Opcodes.OP_EQUALVERIFY, Opcodes.OP_CHECKSIG])
+    return script
+
+
+def script_to_address(script: bytes) -> str:
+    if (
+            (script_hex := script.hex()).startswith(bytes([Opcodes.OP_DUP, Opcodes.OP_HASH160]).hex()) and
+            script_hex.endswith(bytes([Opcodes.OP_EQUALVERIFY, Opcodes.OP_CHECKSIG]).hex())
+    ):
+        return hash160_to_b58_address(script[2:-2])
+    raise Exception("入力値はP2PKHアドレスではない")

@@ -1,7 +1,10 @@
-from .block import Block
+from .block import Block, get_target, load_blocks
 from .tx import Tx, TxIn, OutPoint, TxOut
-from .script import script_int_to_bytes
+from .script import script_int_to_bytes, script_int_to_bytes_contain_opcode
 from .util import bits_to_target
+from .address import address_to_script
+
+from time import time as now_time
 
 import binascii
 import random
@@ -78,6 +81,27 @@ def create_coinbase_tx(script_sig: bytes, script_pubkey: bytes, reward: int) -> 
     )
 
     return coinbase_tx
+
+
+def create_block(height: int, receive_address: str) -> Block:
+    coinbase_tx = create_coinbase_tx(
+        script_sig=script_int_to_bytes_contain_opcode(height)+b"\x00",  # height + OP_0
+        script_pubkey=address_to_script(receive_address)
+    )
+
+    # 一旦ブロックを作る(nonceは0を設定)
+    block = Block(
+        version=1,  # versionの説明は上記ですでにされているため省略
+        hash_prev_block=bytes([0]) * 32,  # 本来はNULLが代入されているが、簡易的な処理しか実装していないので32bytes分の0を代入
+        hash_merkle_root=coinbase_tx.tx_hash(),  # 本来merkle root生成機構を通すべきだが、ジェネシスブロック上では無意味なので省略
+        time=int(now_time()),
+        bits=get_target(load_blocks()),
+        nonce=0,
+        transactions=[coinbase_tx]
+    )
+
+    # マイニングに移行
+    return mining_block(block)
 
 
 def mining_block(block: Block) -> Block:

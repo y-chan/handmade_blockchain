@@ -59,7 +59,7 @@ def create_genesis_block(msg: str, time: int, bits: int, reward: int) -> Block:
     return mining_block(block)
 
 
-def create_coinbase_tx(script_sig: bytes, script_pubkey: bytes, reward: int) -> Tx:
+def create_coinbase_tx(script_sig: bytes, script_pubkey: bytes, reward: int = 50 * 10 ** 9) -> Tx:
     outpoint = OutPoint(
         tx_hash=bytes([0]) * 32,
         index=0xffffffff  # この数値はuint32における最大値。通常の送金等では使われることはまずないだろうということで使われていると推測

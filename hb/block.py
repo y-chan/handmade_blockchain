@@ -125,7 +125,7 @@ def get_target(blocks: List[Block]) -> int:
     難易度変更条件は、2016ブロック生成されるまでにどのくらい時間がかかっているかを見て、指定された時間より長ければ難易度を落とし、
     指定された時間よりも短ければ難易度を上げる
     """
-    if not len(blocks) % retarget_block_count:
+    if len(blocks) % retarget_block_count == 0:
         first = blocks[-(retarget_block_count-1)]
         last = blocks[-1]
         target = bits_to_target(last.bits)
